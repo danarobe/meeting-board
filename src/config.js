@@ -2,8 +2,8 @@
 // 이름은 자유롭게 수정하세요. id는 저장된 데이터와 연결되므로 한번 정하면 유지.
 export const TEAM = [
   { id: 'kyle', name: '카일', color: 'purple' },
-  { id: 'friend', name: '친구', color: 'teal' },
-  { id: 'wife', name: '와이프', color: 'pink' },
+  { id: 'friend', name: '헨리', color: 'teal' },
+  { id: 'wife', name: '다나', color: 'pink' },
 ]
 
 // ── Supabase 연동 ───────────────────────────────────

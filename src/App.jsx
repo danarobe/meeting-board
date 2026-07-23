@@ -74,7 +74,6 @@ function TopicCard({ topic, expanded, onToggleExpand, onAction }) {
       onClick={onToggleExpand}
     >
       <div className="card-row">
-        <span className={`avatar color-${author.color}`}>{author.name[0]}</span>
         <p className="card-title">{topic.title}</p>
         {topic.pinned && !topic.archived && <span className="pin">📌</span>}
         {topic.status === 'discussed' && (
@@ -85,7 +84,7 @@ function TopicCard({ topic, expanded, onToggleExpand, onAction }) {
         )}
       </div>
       {topic.conclusion && topic.status === 'resolved' && (
-        <p className="card-conclusion">{topic.conclusion}</p>
+        <p className="card-conclusion-flat">{topic.conclusion}</p>
       )}
       {expanded && (
         <div className="card-actions" onClick={(e) => e.stopPropagation()}>
@@ -174,15 +173,28 @@ export default function App() {
     return c
   }, [topics])
 
-  const visible = useMemo(() => {
-    const list = topics.filter((t) =>
-      tab === 'archived' ? t.archived : !t.archived && t.status === tab
+  const groups = useMemo(() => {
+    const list = topics
+      .filter((t) =>
+        tab === 'archived' ? t.archived : !t.archived && t.status === tab
+      )
+      .sort((a, b) => {
+        if (!!b.pinned - !!a.pinned) return !!b.pinned - !!a.pinned
+        return new Date(b.created_at) - new Date(a.created_at)
+      })
+    // 본인 안건이 맨 위, 나머지는 TEAM 순서
+    const order = [...TEAM].sort((a, b) =>
+      a.id === user ? -1 : b.id === user ? 1 : 0
     )
-    return list.sort((a, b) => {
-      if (!!b.pinned - !!a.pinned) return !!b.pinned - !!a.pinned
-      return new Date(b.created_at) - new Date(a.created_at)
-    })
-  }, [topics, tab])
+    return order
+      .map((m) => ({
+        member: m,
+        items: list.filter((t) => t.author === m.id),
+      }))
+      .filter((g) => g.items.length > 0)
+  }, [topics, tab, user])
+
+  const visibleCount = groups.reduce((n, g) => n + g.items.length, 0)
 
   const addTopic = async () => {
     const title = input.trim()
@@ -285,23 +297,37 @@ export default function App() {
       {error && <p className="notice notice-error">{error}</p>}
 
       <main className="list">
-        {visible.length === 0 ? (
+        {visibleCount === 0 ? (
           <p className="empty">
             {tab === 'open'
               ? '말할 내용을 아래에 입력해 보세요'
               : '여기엔 아직 아무것도 없어요'}
           </p>
         ) : (
-          visible.map((t) => (
-            <TopicCard
-              key={t.id}
-              topic={t}
-              expanded={expandedId === t.id}
-              onToggleExpand={() =>
-                setExpandedId(expandedId === t.id ? null : t.id)
-              }
-              onAction={(action, payload) => onAction(t, action, payload)}
-            />
+          groups.map((g) => (
+            <section key={g.member.id} className="group">
+              <div className="group-header">
+                <span className={`avatar avatar-sm color-${g.member.color}`}>
+                  {g.member.name[0]}
+                </span>
+                <span className="group-name">
+                  {g.member.name}
+                  {g.member.id === user && ' (나)'}
+                </span>
+                <span className="group-count">{g.items.length}</span>
+              </div>
+              {g.items.map((t) => (
+                <TopicCard
+                  key={t.id}
+                  topic={t}
+                  expanded={expandedId === t.id}
+                  onToggleExpand={() =>
+                    setExpandedId(expandedId === t.id ? null : t.id)
+                  }
+                  onAction={(action, payload) => onAction(t, action, payload)}
+                />
+              ))}
+            </section>
           ))
         )}
       </main>
