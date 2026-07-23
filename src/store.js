@@ -31,6 +31,13 @@ const localStore = {
     const next = all.map((t) => (t.id === id ? { ...t, ...patch } : t))
     localStorage.setItem(LOCAL_KEY, JSON.stringify(next))
   },
+  async remove(id) {
+    const all = await this.list()
+    localStorage.setItem(
+      LOCAL_KEY,
+      JSON.stringify(all.filter((t) => t.id !== id))
+    )
+  },
 }
 
 function makeSupabaseStore() {
@@ -56,6 +63,10 @@ function makeSupabaseStore() {
     },
     async update(id, patch) {
       const { error } = await supabase.from('topics').update(patch).eq('id', id)
+      if (error) throw error
+    },
+    async remove(id) {
+      const { error } = await supabase.from('topics').delete().eq('id', id)
       if (error) throw error
     },
   }

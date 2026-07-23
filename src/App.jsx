@@ -124,6 +124,15 @@ function TopicCard({ topic, expanded, onToggleExpand, onAction }) {
             <button className="btn-small" onClick={() => onAction('archive')}>
               {topic.archived ? '↩ 복원' : '🗂 숨김'}
             </button>
+            <button
+              className="btn-small btn-danger"
+              onClick={() => {
+                if (window.confirm(`"${topic.title}"\n정말 삭제할까요? 되돌릴 수 없습니다.`))
+                  onAction('delete')
+              }}
+            >
+              🗑 삭제
+            </button>
           </div>
           <p className="card-meta">
             {author.name} ·{' '}
@@ -219,6 +228,16 @@ export default function App() {
   }
 
   const onAction = async (topic, action, payload) => {
+    if (action === 'delete') {
+      try {
+        await store.remove(topic.id)
+        setExpandedId(null)
+        await refresh()
+      } catch {
+        setError('삭제에 실패했습니다. 다시 시도해 주세요.')
+      }
+      return
+    }
     const patch =
       action === 'discuss'
         ? { status: 'discussed', discussed_at: new Date().toISOString() }
