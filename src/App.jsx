@@ -66,7 +66,9 @@ function UserPicker({ onPick }) {
 
 function TopicCard({ topic, expanded, onToggleExpand, onAction }) {
   const author = memberOf(topic.author)
-  const [conclusionDraft, setConclusionDraft] = useState(topic.conclusion || '')
+  const [conclusionDraft, setConclusionDraft] = useState(
+    topic.conclusion || topic.detail || ''
+  )
 
   return (
     <div
@@ -86,16 +88,23 @@ function TopicCard({ topic, expanded, onToggleExpand, onAction }) {
       {topic.conclusion && topic.status === 'resolved' && (
         <p className="card-conclusion-flat">{topic.conclusion}</p>
       )}
+      {topic.detail && topic.status !== 'resolved' && (
+        <p className="card-detail">{topic.detail}</p>
+      )}
       {expanded && (
         <div className="card-actions" onClick={(e) => e.stopPropagation()}>
           <div className="conclusion-box">
             <input
               type="text"
-              placeholder="결론을 입력하면 '결론' 상태가 됩니다"
+              placeholder="코멘트를 적어두거나, 결론 저장을 누르세요"
               value={conclusionDraft}
               onChange={(e) => setConclusionDraft(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === 'Enter' && conclusionDraft.trim())
+                if (
+                  e.key === 'Enter' &&
+                  !e.nativeEvent.isComposing &&
+                  conclusionDraft.trim()
+                )
                   onAction('resolve', conclusionDraft.trim())
               }}
             />
@@ -109,7 +118,10 @@ function TopicCard({ topic, expanded, onToggleExpand, onAction }) {
           </div>
           <div className="action-row">
             {topic.status === 'open' && (
-              <button className="btn-small" onClick={() => onAction('discuss')}>
+              <button
+                className="btn-small"
+                onClick={() => onAction('discuss', conclusionDraft.trim())}
+              >
                 ✓ 논의함으로
               </button>
             )}
@@ -240,7 +252,11 @@ export default function App() {
     }
     const patch =
       action === 'discuss'
-        ? { status: 'discussed', discussed_at: new Date().toISOString() }
+        ? {
+            status: 'discussed',
+            discussed_at: new Date().toISOString(),
+            detail: payload || '',
+          }
         : action === 'resolve'
           ? { status: 'resolved', conclusion: payload }
           : action === 'reopen'
@@ -358,7 +374,7 @@ export default function App() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === 'Enter') addTopic()
+            if (e.key === 'Enter' && !e.nativeEvent.isComposing) addTopic()
           }}
         />
         {speech.supported && (

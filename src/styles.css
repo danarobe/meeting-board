@@ -195,6 +195,11 @@ input {
   font-size: 13.5px;
   color: var(--green-text);
 }
+.card-detail {
+  margin: 6px 0 0;
+  font-size: 13.5px;
+  color: var(--text-2);
+}
 
 .group {
   display: flex;
