@@ -20,3 +20,6 @@ alter table topics enable row level security;
 -- (사이트 주소를 외부에 공유하지 마세요)
 create policy "team full access" on topics
   for all using (true) with check (true);
+
+-- 회의 중 서로의 화면이 자동으로 갱신되도록 realtime 구독 대상에 추가
+alter publication supabase_realtime add table topics;

@@ -8,6 +8,9 @@ const LOCAL_KEY = 'mb_topics_v1'
 
 const localStore = {
   mode: 'local',
+  subscribe() {
+    return () => {}
+  },
   async list() {
     try {
       return JSON.parse(localStorage.getItem(LOCAL_KEY)) || []
@@ -44,6 +47,17 @@ function makeSupabaseStore() {
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
   return {
     mode: 'supabase',
+    subscribe(onChange) {
+      const channel = supabase
+        .channel('topics-changes')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'topics' },
+          onChange
+        )
+        .subscribe()
+      return () => supabase.removeChannel(channel)
+    },
     async list() {
       const { data, error } = await supabase
         .from('topics')

@@ -179,6 +179,8 @@ export default function App() {
 
   useEffect(() => {
     refresh()
+    const unsubscribe = store.subscribe?.(() => refresh())
+    return () => unsubscribe?.()
   }, [])
 
   const speech = useSpeech((text) =>
