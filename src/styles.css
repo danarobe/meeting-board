@@ -12,7 +12,7 @@
   --green-text: #3b6d11;
   --radius: 12px;
 }
-@media (prefers-color-scheme: dark) {
+@media not all /* 다크 모드 비활성 — 라이트 고정 (2026-08-19, 대시보드 내장 후 사용자 결정). 되살리려면 not all → (prefers-color-scheme: dark) */ {
   :root {
     --bg: #1c1c1a;
     --surface: #262624;
@@ -116,7 +116,7 @@ input {
   border-color: var(--accent);
   color: #fff;
 }
-@media (prefers-color-scheme: dark) {
+@media not all /* 다크 비활성 */ {
   .tab-active {
     color: #1c1c1a;
   }
@@ -299,7 +299,7 @@ input {
   background: #fbeaf0;
   color: #72243e;
 }
-@media (prefers-color-scheme: dark) {
+@media not all /* 다크 비활성 */ {
   .color-purple {
     background: #3c3489;
     color: #cecbf6;
@@ -374,7 +374,7 @@ input {
   color: #fff;
   font-weight: 700;
 }
-@media (prefers-color-scheme: dark) {
+@media not all /* 다크 비활성 */ {
   .send {
     color: #1c1c1a;
   }

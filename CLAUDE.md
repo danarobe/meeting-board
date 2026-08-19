@@ -15,7 +15,7 @@ React 18 + Vite. 별도 백엔드 없이 Supabase REST를 `@supabase/supabase-js
 - `src/config.js` — 팀원 정의(TEAM: kyle=카일/보라, friend=헨리/청록, wife=다나/핑크)와 Supabase URL/anon 키. **id는 DB의 author 값과 연결되므로 절대 바꾸지 말 것. 이름(name)만 변경 가능.**
 - `src/store.js` — 데이터 어댑터. config에 Supabase 키가 있으면 Supabase, 없으면 localStorage 로컬 모드. list/add/update/remove 인터페이스.
 - `src/App.jsx` — 전체 UI 단일 파일. 사용자 선택(localStorage `mb_user`), 작성자별 그룹 뷰, 탭 필터, 카드 액션, 음성 입력(Web Speech API, ko-KR).
-- `src/styles.css` — 라이트/다크 모드 지원 (`prefers-color-scheme`).
+- `src/styles.css` — **라이트 테마 고정** (2026-08-19, DNRB 대시보드에 iframe 내장 후 사용자 결정 — 대시보드가 항상 라이트라 통일). 다크 블록 4개는 `@media not all`로 비활성만 해둠. 되살리려면 `not all` → `(prefers-color-scheme: dark)`.
 - `supabase/schema.sql` — topics 테이블 정의. RLS는 anon 전체 허용(비공개 URL 전제).
 
 ## 데이터 모델 (topics 테이블)
